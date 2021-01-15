@@ -1,8 +1,8 @@
 /*-
  * #%L
- * LmdbJava
+ * LmdbJavaNative
  * %%
- * Copyright (C) 2016 - 2020 The LmdbJava Open Source Project
+ * Copyright (C) 2016 - 2021 The LmdbJava Open Source Project
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 package org.lmdbjava;
 
-import static io.netty.buffer.PooledByteBufAllocator.DEFAULT;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -37,7 +36,6 @@ import java.util.Comparator;
 
 import com.google.common.primitives.SignedBytes;
 import com.google.common.primitives.UnsignedBytes;
-import io.netty.buffer.ByteBuf;
 import org.agrona.DirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.junit.Test;
@@ -76,10 +74,9 @@ public final class ComparatorTest {
     final ComparatorRunner db = new DirectBufferRunner();
     final ComparatorRunner ba = new ByteArrayRunner();
     final ComparatorRunner bb = new ByteBufferRunner();
-    final ComparatorRunner netty = new NettyRunner();
     final ComparatorRunner gub = new GuavaUnsignedBytes();
     final ComparatorRunner gsb = new GuavaSignedBytes();
-    return new Object[]{string, db, ba, bb, netty, gub, gsb};
+    return new Object[]{string, db, ba, bb, gub, gsb};
   }
 
   private static byte[] buffer(final int... bytes) {
@@ -196,21 +193,6 @@ public final class ComparatorTest {
     public int compare(final byte[] o1, final byte[] o2) {
       final Comparator<byte[]> c = UnsignedBytes.lexicographicalComparator();
       return c.compare(o1, o2);
-    }
-  }
-
-  /**
-   * Tests {@link ByteBufProxy}.
-   */
-  private static class NettyRunner implements ComparatorRunner {
-
-    @Override
-    public int compare(final byte[] o1, final byte[] o2) {
-      final ByteBuf o1b = DEFAULT.directBuffer(o1.length);
-      final ByteBuf o2b = DEFAULT.directBuffer(o2.length);
-      o1b.writeBytes(o1);
-      o2b.writeBytes(o2);
-      return ByteBufProxy.PROXY_NETTY.compare(o1b, o2b);
     }
   }
 

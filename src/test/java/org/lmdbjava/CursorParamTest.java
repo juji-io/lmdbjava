@@ -1,8 +1,8 @@
 /*-
  * #%L
- * LmdbJava
+ * LmdbJavaNative
  * %%
- * Copyright (C) 2016 - 2020 The LmdbJava Open Source Project
+ * Copyright (C) 2016 - 2021 The LmdbJava Open Source Project
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.lmdbjava.ByteArrayProxy.PROXY_BA;
-import static org.lmdbjava.ByteBufProxy.PROXY_NETTY;
 import static org.lmdbjava.ByteBufferProxy.PROXY_OPTIMAL;
 import static org.lmdbjava.ByteBufferProxy.PROXY_SAFE;
 import static org.lmdbjava.DbiFlags.MDB_CREATE;
@@ -46,13 +45,11 @@ import static org.lmdbjava.TestUtils.DB_1;
 import static org.lmdbjava.TestUtils.POSIX_MODE;
 import static org.lmdbjava.TestUtils.bb;
 import static org.lmdbjava.TestUtils.mdb;
-import static org.lmdbjava.TestUtils.nb;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import io.netty.buffer.ByteBuf;
 import org.agrona.DirectBuffer;
 import org.agrona.MutableDirectBuffer;
 import org.junit.Rule;
@@ -84,8 +81,7 @@ public final class CursorParamTest {
     final BufferRunner<ByteBuffer> bb2 = new ByteBufferRunner(PROXY_SAFE);
     final BufferRunner<byte[]> ba = new ByteArrayRunner(PROXY_BA);
     final BufferRunner<DirectBuffer> db = new DirectBufferRunner();
-    final BufferRunner<ByteBuf> netty = new NettyBufferRunner();
-    return new Object[]{bb1, bb2, ba, db, netty};
+    return new Object[]{bb1, bb2, ba, db};
   }
 
   @Test
@@ -283,31 +279,6 @@ public final class CursorParamTest {
 
   }
 
-  /**
-   * {@link BufferRunner} for Netty byte buf.
-   */
-  private static class NettyBufferRunner extends AbstractBufferRunner<ByteBuf> {
-
-    NettyBufferRunner() {
-      super(PROXY_NETTY);
-    }
-
-    @Override
-    public int get(final ByteBuf buff) {
-      return buff.getInt(0);
-    }
-
-    @Override
-    public ByteBuf set(final int val) {
-      return nb(val);
-    }
-
-    @Override
-    public void set(final ByteBuf buff, final int val) {
-      buff.setInt(0, val);
-    }
-
-  }
 
   /**
    * Adapter to allow different buffers to be tested with this class.

@@ -1,8 +1,8 @@
 /*-
  * #%L
- * LmdbJava
+ * LmdbJavaNative
  * %%
- * Copyright (C) 2016 - 2020 The LmdbJava Open Source Project
+ * Copyright (C) 2016 - 2021 The LmdbJava Open Source Project
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 package org.lmdbjava;
 
-import static io.netty.buffer.PooledByteBufAllocator.DEFAULT;
 import static java.lang.Integer.BYTES;
 import static java.nio.ByteBuffer.allocateDirect;
 
@@ -28,7 +27,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 
-import io.netty.buffer.ByteBuf;
 import org.agrona.MutableDirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
 
@@ -76,10 +74,5 @@ final class TestUtils {
     return b;
   }
 
-  static ByteBuf nb(final int value) {
-    final ByteBuf b = DEFAULT.directBuffer(BYTES);
-    b.writeInt(value);
-    return b;
-  }
 
 }
