@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,29 +33,11 @@ import org.graalvm.nativeimage.c.type.CFloatPointer;
 import org.graalvm.nativeimage.c.type.CIntPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Entry-point to the application
  */
-@CContext(NativeMain.Directives.class)
+@CContext(NativeLibrary.Directives.class)
 public class NativeMain {
-    /**
-     * Sets up the context required for interacting with native libraries.
-     */
-    public static final class Directives implements CContext.Directives {
-        @Override
-        public List<String> getHeaderFiles() {
-            return Collections.singletonList("<lmdb.h>");
-        }
-
-        @Override
-        public List<String> getLibraries() {
-            return Arrays.asList("lmdb");
-        }
-    }
 
     public static void main(String[] args) {
         System.out.println("OK");
@@ -66,84 +48,6 @@ public class NativeMain {
         //     GLUT.init(argc, argv.get());
         // }
 
-        // Window
-        // GLUT.initDisplayMode(GLUT.SINGLE() | GLUT.RGB() | GLUT.DEPTH());
-        // GLUT.initWindowPosition(15, 15);
-        // GLUT.initWindowSize(400, 400);
-        // try (var title = CTypeConversion.toCString("Utah Teapot - GraalVM")) {
-        //     GLUT.createWindow(title.get());
-        // }
-
-        // // Materials
-        // GL.clearColor(0.5f, 0.5f, 0.5f, 0f);
-        // GL.shadeModel(GL.SMOOTH());
-        // try (var white = PinnedObject.create(new float[] {1f, 1f, 1f, 0f});
-        //      var shine = PinnedObject.create(new float[] {70f})) {
-        //     GL.lightfv(GL.LIGHT0(), GL.AMBIENT(), white.addressOfArrayElement(0));
-        //     GL.lightfv(GL.LIGHT0(), GL.DIFFUSE(), white.addressOfArrayElement(0));
-        //     GL.materialfv(GL.FRONT(), GL.SHININESS(), shine.addressOfArrayElement(0));
-        // }
-        // GL.enable(GL.LIGHTING());
-        // GL.enable(GL.LIGHT0());
-        // GL.enable(GL.DEPTH_TEST());
-
-        // // Callbacks
-        // GLUT.displayFunc(displayCallback.getFunctionPointer());
-        // GLUT.idleFunc(idleCallback.getFunctionPointer());
-
-        // // Begin
-        // GLUT.mainLoop();
     }
 
-    /**
-     * Holds a pointer to an off-heap global variable that stores
-     * the angle of rotation. The angle is represented as a float.
-     */
-    // private static final CGlobalData<CFloatPointer> rotation = CGlobalDataFactory.createBytes(() -> 4);
-
-    /**
-     * Creates a callback function for {@link GLUT#displayFunc(GLUT.Callback)}.
-     * It must have the same signature as {@link GLUT.Callback#invoke()}.
-     */
-    // @CEntryPoint
-    // @CEntryPointOptions(prologue = CEntryPointSetup.EnterCreateIsolatePrologue.class,
-    //                     epilogue = CEntryPointSetup.LeaveTearDownIsolateEpilogue.class)
-    // private static void display() {
-    //     GL.clear(GL.COLOR_BUFFER_BIT() | GL.DEPTH_BUFFER_BIT());
-
-    //     GL.pushMatrix();
-    //     GL.rotatef(rotation.get().read(), 0f, 1f, 1f);
-    //     try (var mat = PinnedObject.create(new float[] {1, 0, 0, 0})) {
-    //         GL.materialfv(GL.FRONT(), GL.DIFFUSE(), mat.addressOfArrayElement(0));
-    //     }
-    //     GLUT.wireTeapot(0.5);
-    //     GL.popMatrix();
-
-    //     GL.flush();
-    // }
-
-    /**
-     * Holds the pointer to {@link Main#display()} function.
-     */
-    // private static final CEntryPointLiteral<GLUT.Callback> displayCallback =
-    //         CEntryPointLiteral.create(Main.class, "display");
-
-    /**
-     * Creates a callback function for {@link GLUT#idleFunc(GLUT.Callback)}.
-     * It must have the same signature as {@link GLUT.Callback#invoke()}.
-     */
-    // @CEntryPoint
-    // @CEntryPointOptions(prologue = CEntryPointSetup.EnterCreateIsolatePrologue.class,
-    //                     epilogue = CEntryPointSetup.LeaveTearDownIsolateEpilogue.class)
-    // private static void idle() {
-    //     var rotPtr = rotation.get();
-    //     rotPtr.write(0.1f + rotPtr.read());
-    //     GLUT.postRedisplay();
-    // }
-
-    /**
-     * Holds the pointer to {@link Main#idle()} function.
-     */
-    // private static final CEntryPointLiteral<GLUT.Callback> idleCallback =
-    //         CEntryPointLiteral.create(Main.class, "idle");
 }
