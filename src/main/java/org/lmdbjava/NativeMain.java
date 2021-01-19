@@ -32,21 +32,46 @@ import org.graalvm.nativeimage.c.function.CEntryPointLiteral;
 import org.graalvm.nativeimage.c.type.CFloatPointer;
 import org.graalvm.nativeimage.c.type.CIntPointer;
 import org.graalvm.nativeimage.c.type.CTypeConversion;
+import org.graalvm.nativeimage.c.type.CTypeConversion.CCharPointerHolder;
+import org.graalvm.nativeimage.c.type.WordPointer;
+import org.graalvm.nativeimage.c.type.CCharPointer;
+import org.graalvm.word.Pointer;
+
+import java.io.File;
 
 /**
  * Entry-point to the application
  */
-@CContext(NativeLibrary.Directives.class)
+@CContext(LMDB.Directives.class)
 public class NativeMain {
 
+    static CGlobalData<WordPointer> env =
+        CGlobalDataFactory.createBytes(() -> 8);
+
+    static String msg(int rc) {
+        return CTypeConversion.toJavaString(LMDB.mdb_strerror(rc));
+    }
+
     public static void main(String[] args) {
-        System.out.println("OK");
-        // Init
-        // try (var argv = CTypeConversion.toCStrings(args)) {
-        //     var argc = StackValue.get(CIntPointer.class);
-        //     argc.write(args.length);
-        //     GLUT.init(argc, argv.get());
-        // }
+
+        String filePath = "/tmp/nativetestdb";
+
+        File dir = new File(filePath);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        int rc;
+
+        rc = LMDB.mdb_env_create(env.get().addressOf(0));
+        System.out.println("create: " + msg(rc));
+
+        try (CCharPointerHolder path = CTypeConversion.toCString(filePath)) {
+            rc = LMDB.mdb_env_open(env.get().read(), path.get(), 0, 0664);
+            System.out.println("open: " + msg(rc));
+        }
+
+
 
     }
 

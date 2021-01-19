@@ -1,3 +1,23 @@
+/*-
+ * #%L
+ * LmdbJavaNative
+ * %%
+ * Copyright (C) 2016 - 2021 The LmdbJava Open Source Project
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 package org.lmdbjava;
 
 import org.graalvm.nativeimage.IsolateThread;
@@ -26,10 +46,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * GraalVM native image bindings to liblmdb.
+ * GraalVM native image bindings to LMDB.
  */
-@CContext(NativeLibrary.Directives.class)
-final class NativeLibrary {
+@CContext(LMDB.Directives.class)
+final class LMDB {
 
     /**
      * Sets up the context required for interacting with native libraries.
@@ -47,27 +67,6 @@ final class NativeLibrary {
     }
 
     /**
-     * Opaque structure for a database environment.
-     */
-    @CStruct("MDB_env")
-    interface MDB_env extends PointerBase {
-    }
-
-    /**
-     * Opaque structure for a transaction handle.
-     */
-    @CStruct("MDB_txn")
-    interface MDB_txn extends PointerBase {
-    }
-
-    /**
-     * Opaque structure for navigating through a database.
-     */
-    @CStruct("MDB_cursor")
-    interface MDB_cursor extends PointerBase {
-    }
-
-    /**
      * Generic structure used for passing keys and data in and out
      * of the database.
      */
@@ -80,10 +79,10 @@ final class NativeLibrary {
         @CField("mv_size")
         void set_mv_size(long value);
 
-        @CFieldAddress("mv_data")
+        @CField("mv_data")
         VoidPointer get_mv_data();
 
-        @CFieldAddress("mv_data")
+        @CField("mv_data")
         void set_mv_data(VoidPointer value);
     }
 
@@ -111,7 +110,7 @@ final class NativeLibrary {
     @CConstant("MDB_NOLOCK") static native int MDB_NOLOCK();
     @CConstant("MDB_NORDAHEAD") static native int MDB_NORDAHEAD();
     @CConstant("MDB_NOMEMINIT") static native int MDB_NOMEMINIT();
-    @CConstant("MDB_PREVSNAPSHOT") static native int MDB_PREVSNAPSHOT();
+    // @CConstant("MDB_PREVSNAPSHOT") static native int MDB_PREVSNAPSHOT();
 
     /**
      * mdb_dbi_open Database flags
@@ -143,8 +142,8 @@ final class NativeLibrary {
     /**
      * Cursor Get operations.
      */
-    @CEnum("MDB_cursor_op")
-    enum MDB_cursor_op {
+    @CEnum("Pointer_op")
+    enum Pointer_op {
         MDB_FIRST,				/**<  Position at first key/data item */
         MDB_FIRST_DUP,		/**< Position at first data item of current key.
                              Only for #MDB_DUPSORT */
@@ -181,7 +180,7 @@ final class NativeLibrary {
         public native int getCValue();
 
         @CEnumLookup
-        public static native MDB_cursor_op fromCValue(int value);
+        public static native Pointer_op fromCValue(int value);
     }
 
     /**
@@ -208,8 +207,8 @@ final class NativeLibrary {
     @CConstant("MDB_BAD_TXN") static native int MDB_BAD_TXN();
     @CConstant("MDB_BAD_VALSIZE") static native int MDB_BAD_VALSIZE();
     @CConstant("MDB_BAD_DBI") static native int MDB_BAD_DBI();
-    @CConstant("MDB_PROBLEM") static native int MDB_PROBLEM();
-    @CConstant("MDB_LAST_ERRCODE") static native int MDB_LAST_ERRCODE();
+    // @CConstant("MDB_PROBLEM") static native int MDB_PROBLEM();
+    // @CConstant("MDB_LAST_ERRCODE") static native int MDB_LAST_ERRCODE();
 
     /**
      * Statistics for a database in the environment
@@ -278,65 +277,65 @@ final class NativeLibrary {
     static native int mdb_env_create(WordPointer envPtr);
 
     @CFunction("mdb_env_open")
-    static native int mdb_env_open(MDB_env env, CCharPointer path, int flags,
+    static native int mdb_env_open(Pointer env, CCharPointer path, int flags,
                                    int mode);
 
     @CFunction("mdb_env_copy")
-    static native int mdb_env_copy(MDB_env env, CCharPointer path);
+    static native int mdb_env_copy(Pointer env, CCharPointer path);
 
     @CFunction("mdb_env_copyfd")
-    static native int mdb_env_copyfd(MDB_env env, int fd);
+    static native int mdb_env_copyfd(Pointer env, int fd);
 
     @CFunction("mdb_env_copy2")
-    static native int mdb_env_copy2(MDB_env env, CCharPointer path, int flags);
+    static native int mdb_env_copy2(Pointer env, CCharPointer path, int flags);
 
     @CFunction("mdb_env_copyfd2")
-    static native int mdb_env_copyfd2(MDB_env env, int fd, int flags);
+    static native int mdb_env_copyfd2(Pointer env, int fd, int flags);
 
     @CFunction("mdb_env_stat")
-    static native int mdb_env_stat(MDB_env env, MDB_stat stat);
+    static native int mdb_env_stat(Pointer env, MDB_stat stat);
 
     @CFunction("mdb_env_info")
-    static native int mdb_env_info(MDB_env env, MDB_envinfo info);
+    static native int mdb_env_info(Pointer env, MDB_envinfo info);
 
     @CFunction("mdb_env_sync")
-    static native int mdb_env_sync(MDB_env env, int force);
+    static native int mdb_env_sync(Pointer env, int force);
 
     @CFunction("mdb_env_close")
-    static native void mdb_env_close(MDB_env env);
+    static native void mdb_env_close(Pointer env);
 
     @CFunction("mdb_env_set_flags")
-    static native int mdb_env_set_flags(MDB_env env, int flags, int onoff);
+    static native int mdb_env_set_flags(Pointer env, int flags, int onoff);
 
     @CFunction("mdb_env_get_flags")
-    static native int mdb_env_get_flags(MDB_env env, CIntPointer flags);
+    static native int mdb_env_get_flags(Pointer env, CIntPointer flags);
 
     @CFunction("mdb_env_get_path")
-    static native int mdb_env_get_path(MDB_env env, CCharPointerPointer path);
+    static native int mdb_env_get_path(Pointer env, CCharPointerPointer path);
 
     @CFunction("mdb_env_get_fd")
-    static native int mdb_env_get_fd(MDB_env env, CIntPointer fd);
+    static native int mdb_env_get_fd(Pointer env, CIntPointer fd);
 
     @CFunction("mdb_env_set_mapsize")
-    static native int mdb_env_set_mapsize(MDB_env env, long size);
+    static native int mdb_env_set_mapsize(Pointer env, long size);
 
     @CFunction("mdb_env_set_maxreaders")
-    static native int mdb_env_set_maxreaders(MDB_env env, int readers);
+    static native int mdb_env_set_maxreaders(Pointer env, int readers);
 
     @CFunction("mdb_env_get_maxreaders")
-    static native int mdb_env_get_maxreaders(MDB_env env, CIntPointer readers);
+    static native int mdb_env_get_maxreaders(Pointer env, CIntPointer readers);
 
     @CFunction("mdb_env_set_maxdbs")
-    static native int mdb_env_set_maxdbs(MDB_env env, int dbs);
+    static native int mdb_env_set_maxdbs(Pointer env, int dbs);
 
     @CFunction("mdb_env_get_maxkeysize")
-    static native int mdb_env_get_maxkeysize(MDB_env env);
+    static native int mdb_env_get_maxkeysize(Pointer env);
 
     @CFunction("mdb_env_set_userctx")
-    static native int mdb_env_set_userctx(MDB_env env, VoidPointer ctx);
+    static native int mdb_env_set_userctx(Pointer env, VoidPointer ctx);
 
     @CFunction("mdb_env_get_userctx")
-    static native VoidPointer mdb_env_get_userctx(MDB_env env);
+    static native VoidPointer mdb_env_get_userctx(Pointer env);
 
     /**
      * A callback function for most LMDB assert() failures,
@@ -345,117 +344,117 @@ final class NativeLibrary {
     public interface MDB_assert_func extends CFunctionPointer {
 
         @InvokeCFunctionPointer
-        int invoke(IsolateThread thread, MDB_env env, CCharPointer msg);
+        int invoke(IsolateThread thread, Pointer env, CCharPointer msg);
     }
 
     @CFunction("mdb_env_set_assert")
-    static native VoidPointer mdb_env_set_assert(MDB_env env,
+    static native VoidPointer mdb_env_set_assert(Pointer env,
                                                  MDB_assert_func func);
 
     /**
      * LMDB transaction functions
      */
     @CFunction("mdb_txn_begin")
-    static native int mdb_txn_begin(MDB_env env, MDB_txn parentTx, int flags,
+    static native int mdb_txn_begin(Pointer env, Pointer parentTx, int flags,
                                     WordPointer txPtr);
 
     @CFunction("mdb_txn_env")
-    static native MDB_env mdb_txn_env(MDB_txn txn);
+    static native Pointer mdb_txn_env(Pointer txn);
 
     @CFunction("mdb_txn_id")
-    static native long mdb_txn_id(MDB_txn txn);
+    static native long mdb_txn_id(Pointer txn);
 
     @CFunction("mdb_txn_commit")
-    static native int mdb_txn_commit(MDB_txn txn);
+    static native int mdb_txn_commit(Pointer txn);
 
     @CFunction("mdb_txn_abort")
-    static native void mdb_txn_abort(MDB_txn txn);
+    static native void mdb_txn_abort(Pointer txn);
 
     @CFunction("mdb_txn_reset")
-    static native void mdb_txn_reset(MDB_txn txn);
+    static native void mdb_txn_reset(Pointer txn);
 
     @CFunction("mdb_txn_renew")
-    static native int mdb_txn_renew(MDB_txn txn);
+    static native int mdb_txn_renew(Pointer txn);
 
     /**
      * LMDB dbi functions
      */
     @CFunction("mdb_dbi_open")
-    static native int mdb_dbi_open(MDB_txn txn, CCharPointer name, int flags,
+    static native int mdb_dbi_open(Pointer txn, CCharPointer name, int flags,
                                    CIntPointer dbi);
 
     @CFunction("mdb_stat")
-    static native int mdb_stat(MDB_txn txn, int dbi, MDB_stat stat);
+    static native int mdb_stat(Pointer txn, int dbi, MDB_stat stat);
 
     @CFunction("mdb_dbi_flags")
-    static native int mdb_dbi_flags(MDB_txn txn, int dbi, CIntPointer flags);
+    static native int mdb_dbi_flags(Pointer txn, int dbi, CIntPointer flags);
 
     @CFunction("mdb_dbi_close")
-    static native void mdb_dbi_close(MDB_env env, int dbi);
+    static native void mdb_dbi_close(Pointer env, int dbi);
 
     @CFunction("mdb_drop")
-    static native int mdb_drop(MDB_txn txn, int dbi, int del);
+    static native int mdb_drop(Pointer txn, int dbi, int del);
 
     /**
      * LMDB data access functions
      */
     @CFunction("mdb_set_compare")
-    static native int mdb_set_compare(MDB_txn txn, int dbi, MDB_cmp_func cmp);
+    static native int mdb_set_compare(Pointer txn, int dbi, MDB_cmp_func cmp);
 
     @CFunction("mdb_set_dupsort")
-    static native int mdb_set_dupsort(MDB_txn txn, int dbi, MDB_cmp_func cmp);
+    static native int mdb_set_dupsort(Pointer txn, int dbi, MDB_cmp_func cmp);
 
     @CFunction("mdb_get")
-    static native int mdb_get(MDB_txn txn, int dbi, MDB_val key, MDB_val data);
+    static native int mdb_get(Pointer txn, int dbi, MDB_val key, MDB_val data);
 
     @CFunction("mdb_put")
-    static native int mdb_get(MDB_txn txn, int dbi, MDB_val key,
+    static native int mdb_get(Pointer txn, int dbi, MDB_val key,
                               MDB_val data, int flags);
 
     @CFunction("mdb_del")
-    static native int mdb_del(MDB_txn txn, int dbi, MDB_val key, MDB_val data);
+    static native int mdb_del(Pointer txn, int dbi, MDB_val key, MDB_val data);
 
     /**
      * Cursor functions
      */
     @CFunction("mdb_cursor_open")
-    static native int mdb_cursor_open(MDB_txn txn, int dbi,
+    static native int mdb_cursor_open(Pointer txn, int dbi,
                                       WordPointer cursorPtr);
 
     @CFunction("mdb_cursor_close")
-    static native void mdb_cursor_close(MDB_cursor cursor);
+    static native void mdb_cursor_close(Pointer cursor);
 
     @CFunction("mdb_cursor_renew")
-    static native int mdb_cursor_renew(MDB_txn txn, MDB_cursor cursor);
+    static native int mdb_cursor_renew(Pointer txn, Pointer cursor);
 
     @CFunction("mdb_cursor_txn")
-    static native MDB_txn mdb_cursor_txn(MDB_cursor cursor);
+    static native Pointer mdb_cursor_txn(Pointer cursor);
 
     @CFunction("mdb_cursor_dbi")
-    static native int mdb_cursor_dbi(MDB_cursor cursor);
+    static native int mdb_cursor_dbi(Pointer cursor);
 
     @CFunction("mdb_cursor_get")
-    static native int mdb_cursor_get(MDB_cursor cursor, MDB_val k, MDB_val v,
-                                     MDB_cursor_op cursorOp);
+    static native int mdb_cursor_get(Pointer cursor, MDB_val k, MDB_val v,
+                                     Pointer_op cursorOp);
 
     @CFunction("mdb_cursor_put")
-    static native int mdb_cursor_put(MDB_cursor cursor, MDB_val key, MDB_val data,
+    static native int mdb_cursor_put(Pointer cursor, MDB_val key, MDB_val data,
                                      int flags);
 
     @CFunction("mdb_cursor_del")
-    static native int mdb_cursor_del(MDB_cursor cursor, int flags);
+    static native int mdb_cursor_del(Pointer cursor, int flags);
 
     @CFunction("mdb_cursor_count")
-    static native int mdb_cursor_count(MDB_cursor cursor, CLongPointer countp);
+    static native int mdb_cursor_count(Pointer cursor, CLongPointer countp);
 
     /**
      * Utitily functions
      */
     @CFunction("mdb_cmp")
-    static native int mdb_cmp(MDB_txn txn, int dbi, MDB_val a, MDB_val b);
+    static native int mdb_cmp(Pointer txn, int dbi, MDB_val a, MDB_val b);
 
     @CFunction("mdb_dcmp")
-    static native int mdb_dcmp(MDB_txn txn, int dbi, MDB_val a, MDB_val b);
+    static native int mdb_dcmp(Pointer txn, int dbi, MDB_val a, MDB_val b);
 
     /**
      * A callback function used to print a message from the library.
@@ -467,10 +466,10 @@ final class NativeLibrary {
     }
 
     @CFunction("mdb_reader_list")
-    static native int mdb_reader_check(MDB_env env, MDB_msg_func func,
+    static native int mdb_reader_check(Pointer env, MDB_msg_func func,
                                        VoidPointer ctx);
 
     @CFunction("mdb_reader_check")
-    static native int mdb_reader_check(MDB_env env, CIntPointer dead);
+    static native int mdb_reader_check(Pointer env, CIntPointer dead);
 
 }
